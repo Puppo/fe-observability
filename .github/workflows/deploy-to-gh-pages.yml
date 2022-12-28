@@ -1,0 +1,65 @@
+name: Build and Deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: Set up Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18.12.1'
+
+      - name: Setup Nx 🐳
+        uses: nrwl/nx-set-shas@v3
+
+      - name: Cache node modules 📦
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: npm list
+
+      - name: Install
+        run: npm install
+
+      - name: Linting 🧹 & Formatting 🎨
+        run: |
+          npx nx workspace-lint
+          npx nx format:check
+          npx nx affected --target=lint
+
+      - name: Test 🧪
+        run: npx nx affected --target=test
+
+      - name: Build 🔧
+        run: npx nx affected --target=build --prod
+
+      - name: Deploy 🚀
+        run: |
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          npx nx affected --target=deploy -u "github-actions-bot <support+actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

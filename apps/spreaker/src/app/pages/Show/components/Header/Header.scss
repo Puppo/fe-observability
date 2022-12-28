@@ -1,0 +1,11 @@
+.header {
+  .container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+  }
+
+  .image {
+    margin-right: 15px;
+  }
+}

@@ -1,0 +1,26 @@
+.header {
+  display: flex;
+  flex-flow: row nowrap;
+
+  &_image {
+    margin-right: 30px;
+  }
+
+  &_author {
+    margin: 16px 0;
+  }
+
+  &_social {
+    margin: 16px 0;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+
+    > div {
+      margin: 0 20px 0 0;
+      display: flex;
+      flex-flow: row;
+      align-items: center;
+    }
+  }
+}
