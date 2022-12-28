@@ -1,5 +1,7 @@
 @fe-observability/api/spreaker
 
+@fe-observability/ui
+
 @fe-observability/utils/http
 
 @nrwl/webpack
