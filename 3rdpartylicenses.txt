@@ -2,7 +2,11 @@
 
 @fe-observability/ui
 
+@fe-observability/utils/errors
+
 @fe-observability/utils/http
+
+@fe-observability/utils/package-info
 
 @nrwl/webpack
 MIT
