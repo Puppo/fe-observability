@@ -3,6 +3,8 @@ import {
   ShowDto,
   spreakerHttpClient,
 } from '@fe-observability/api/spreaker';
+import { ErrorBoundary } from '@fe-observability/ui';
+import { usePackageInfo } from '@fe-observability/utils/package-info';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
@@ -10,7 +12,7 @@ import Episode from './components/Episode';
 import Footer from './components/Footer';
 import Header from './components/Header';
 
-export default function Show() {
+function Show() {
   const { showId: showIdParam } = useParams();
   const [showId, setShowId] = useState<number | null>(null);
   const [show, setShow] = useState<ShowDto | undefined>(undefined);
@@ -74,5 +76,19 @@ export default function Show() {
         author={show.author.fullname}
       />
     </>
+  );
+}
+
+export default function ShowWithErrorBoundary() {
+  const { name, version, environment } = usePackageInfo();
+  return (
+    <ErrorBoundary
+      name="Show"
+      packageName={name}
+      packageVersion={version}
+      environment={environment}
+    >
+      <Show />
+    </ErrorBoundary>
   );
 }

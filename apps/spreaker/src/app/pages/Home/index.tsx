@@ -1,23 +1,39 @@
 import {
   ShowSearchItemDto,
+  ShowSearchItemErrorDto,
   spreakerHttpClient,
 } from '@fe-observability/api/spreaker';
-import { InputSearch, InputSearchOption } from '@fe-observability/ui';
+import {
+  ErrorBoundary,
+  InputSearch,
+  InputSearchOption,
+  useAsyncError,
+} from '@fe-observability/ui';
+import { usePackageInfo } from '@fe-observability/utils/package-info';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import './Home.scss';
 
-export default function Home() {
+function Home() {
+  const throwAsyncError = useAsyncError();
+  const { search } = useLocation();
+  const query = new URLSearchParams(search);
+  const homeType: 'error' | 'ok' =
+    query.get('responseType') === 'error' ? 'error' : 'ok';
   const [searchTerms, setSearchTerms] = useState<string | undefined>(undefined);
-  const [shows, setShows] = useState<InputSearchOption<ShowSearchItemDto>[]>(
-    []
-  );
+  const [shows, setShows] = useState<
+    InputSearchOption<ShowSearchItemDto | ShowSearchItemErrorDto>[]
+  >([]);
 
   useEffect(() => {
     setShows([]);
     if (!searchTerms) return;
-    spreakerHttpClient.shows
-      .search(searchTerms)
+    const searchFn =
+      homeType === 'error'
+        ? spreakerHttpClient.shows.searchWithError
+        : spreakerHttpClient.shows.search;
+    searchFn(searchTerms)
       .then((response) => {
         const shows = response.response.items.map((item) => ({
           value: item.show_id,
@@ -27,7 +43,9 @@ export default function Home() {
         }));
         setShows(shows);
       })
-      .catch(console.error);
+      .catch((e) => {
+        throwAsyncError(e);
+      });
   }, [searchTerms]);
 
   function onSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -47,5 +65,19 @@ export default function Home() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function HomeWithErrorBoundary() {
+  const { name, version, environment } = usePackageInfo();
+  return (
+    <ErrorBoundary
+      name="Home"
+      packageName={name}
+      packageVersion={version}
+      environment={environment}
+    >
+      <Home />
+    </ErrorBoundary>
   );
 }

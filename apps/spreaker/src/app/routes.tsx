@@ -1,4 +1,5 @@
-import { NavBar } from '@fe-observability/ui';
+import { ErrorBoundary, NavBar } from '@fe-observability/ui';
+import { usePackageInfo } from '@fe-observability/utils/package-info';
 import React from 'react';
 import {
   createHashRouter,
@@ -46,5 +47,15 @@ const routes: RouteObject[] = [
 const router = createHashRouter(routes);
 
 export default function Router() {
-  return <RouterProvider router={router} />;
+  const { name, environment, version } = usePackageInfo();
+  return (
+    <ErrorBoundary
+      name="App"
+      packageName={name}
+      packageVersion={version}
+      environment={environment}
+    >
+      <RouterProvider router={router} />
+    </ErrorBoundary>
+  );
 }

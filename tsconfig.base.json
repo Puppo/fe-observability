@@ -17,7 +17,11 @@
     "paths": {
       "@fe-observability/api/spreaker": ["libs/api/spreaker/src/index.ts"],
       "@fe-observability/ui": ["libs/ui/src/index.ts"],
-      "@fe-observability/utils/http": ["libs/utils/http/src/index.ts"]
+      "@fe-observability/utils/errors": ["libs/utils/errors/src/index.ts"],
+      "@fe-observability/utils/http": ["libs/utils/http/src/index.ts"],
+      "@fe-observability/utils/package-info": [
+        "libs/utils/package-info/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -3,7 +3,8 @@ import {
   spreakerHttpClient,
   UserDto,
 } from '@fe-observability/api/spreaker';
-import { AudioPlayer } from '@fe-observability/ui';
+import { AudioPlayer, ErrorBoundary } from '@fe-observability/ui';
+import { usePackageInfo } from '@fe-observability/utils/package-info';
 
 import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router';
@@ -11,7 +12,7 @@ import Author from './components/Author';
 import Header from './components/Header';
 import Info from './components/Info';
 
-export default function Episode() {
+function Episode() {
   const { episodeId: episodeIdParam } = useParams();
   const { search } = useLocation();
   const query = new URLSearchParams(search);
@@ -103,5 +104,19 @@ export default function Episode() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function EpisodeWithErrorBoundary() {
+  const { name, version, environment } = usePackageInfo();
+  return (
+    <ErrorBoundary
+      name="Episode"
+      packageName={name}
+      packageVersion={version}
+      environment={environment}
+    >
+      <Episode />
+    </ErrorBoundary>
   );
 }
